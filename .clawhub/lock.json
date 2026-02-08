@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "skills": {
+    "peekaboo": {
+      "version": "1.0.0",
+      "installedAt": 1770540998896
+    },
+    "bird": {
+      "version": "1.0.0",
+      "installedAt": 1770541001660
+    },
+    "agent-browser": {
+      "version": "0.2.0",
+      "installedAt": 1770541004839
+    },
+    "apple-notes": {
+      "version": "1.0.0",
+      "installedAt": 1770541007504
+    },
+    "things-mac": {
+      "version": "1.0.0",
+      "installedAt": 1770541010841
+    },
+    "brave-search": {
+      "version": "1.0.1",
+      "installedAt": 1770541014312
+    },
+    "web-search-plus": {
+      "version": "2.6.2",
+      "installedAt": 1770541018450
+    },
+    "resume-optimizer": {
+      "version": "1.0.1",
+      "installedAt": 1770543610661
+    },
+    "lead-hunter": {
+      "version": "1.0.1",
+      "installedAt": 1770543614344
+    },
+    "summarize": {
+      "version": "1.0.0",
+      "installedAt": 1770543617302
+    },
+    "trend-watcher": {
+      "version": "1.0.1",
+      "installedAt": 1770543645776
+    },
+    "joko-moltbook": {
+      "version": "1.0.0",
+      "installedAt": 1770543652127
+    },
+    "clawdex": {
+      "version": "1.0.2",
+      "installedAt": 1770552695125
+    },
+    "moltbot-security": {
+      "version": "1.0.2",
+      "installedAt": 1770552700609
+    },
+    "tweet-writer": {
+      "version": "1.0.0",
+      "installedAt": 1770553085896
+    },
+    "reply": {
+      "version": "1.0.0",
+      "installedAt": 1770553087923
+    },
+    "research-cog": {
+      "version": "1.0.2",
+      "installedAt": 1770553093726
+    },
+    "research-company": {
+      "version": "1.0.0",
+      "installedAt": 1770553095736
+    },
+    "job-auto-apply": {
+      "version": "1.0.0",
+      "installedAt": 1770553102501
+    },
+    "inkedin-automation-that-really-works": {
+      "version": "1.0.1",
+      "installedAt": 1770553105543
+    }
+  }
+}

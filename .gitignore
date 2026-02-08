@@ -1,0 +1,30 @@
+# Sensitive files
+.openwork_credentials.json
+*.key
+*.pem
+.env
+
+# Large binary files
+*.skill
+*.tar.gz
+*.zip
+
+# Node modules
+node_modules/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
