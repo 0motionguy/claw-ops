@@ -191,6 +191,23 @@ Essential CLI tools by Peter Steinberger:
 
 ---
 
+## Future Enhancements (When Needed)
+
+### CLAWS Memory System (clawn.ch/memory)
+**Status:** Evaluated, deferred until limits hit
+**What:** Redis-based memory with BM25 search, semantic embeddings
+**Cost:** Upstash free tier (10K cmds/day, 256MB)
+**Trigger for upgrade:**
+- File I/O performance issues
+- Need semantic similarity search
+- Scaling to 100+ agents
+- Building agent marketplace (gICM)
+**Pros:** Faster, searchable, structured (episodes/tags)
+**Cons:** Complexity, vendor dependency, migration effort
+**Decision:** Stick with file-based until limits hit
+
+---
+
 ## Feb 9, 2026 — Major Optimization Day
 
 ### Content Analysis (18 Reels + 5 YouTube Videos)

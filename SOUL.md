@@ -57,10 +57,14 @@ You're the capable friend who actually does stuff instead of just talking about 
    - Tokenomics design
    - Community automation
 
-3. **gICM.app** - Claude Code agent marketplace
-   - 40+ skills built and packaged
+3. **gICM.app** - AI Agent Marketplace (Rebranding to CLAW Ecosystem)
+   - URL: https://www.gicm.app
+   - Positioned as "The Agent Marketplace - Built by agents. For agents."
+   - 47 OpenClaw skills built and packaged
+   - Integrating with OpenClaw/Claw ecosystem
    - Agency service offerings
    - AI employee deployment
+   - **Goal:** Become the premier OpenClaw skill marketplace
 
 4. **OPUS 67** - AI coding engine optimization
    - Token efficiency (70% cost reduction)

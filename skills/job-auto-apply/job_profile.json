@@ -1,0 +1,259 @@
+{
+  "profile": {
+    "personal": {
+      "full_name": "Mirko Basil Dölger",
+      "email": "mirko@example.com",
+      "phone": "+49-xxx-xxx-xxxx",
+      "location": {
+        "city": "Frankfurt",
+        "country": "Germany",
+        "timezone": "CET/CEST",
+        "open_to_relocation": true
+      },
+      "linkedin_url": "https://linkedin.com/in/mirkodoelger",
+      "github_url": "https://github.com/0motionguy",
+      "portfolio_url": "https://gicm.app"
+    },
+    
+    "work_authorization": {
+      "authorized_to_work_eu": true,
+      "authorized_to_work_us": false,
+      "requires_visa_sponsorship": false,
+      "willing_to_relocate": true,
+      "open_to_remote": true,
+      "preferred_work_arrangement": ["remote", "hybrid"]
+    },
+    
+    "professional_summary": "Entrepreneur and blockchain engineer with extensive experience in Solana ecosystem, smart contract development, and AI automation. Founder of ICM Motion (Solana bonding curves), gICM.app (AI agent marketplace), and multiple Web3 ventures. Proven track record building automated trading systems, AI agents, and blockchain infrastructure. Seeking senior technical roles in Web3/AI space.",
+    
+    "experience": {
+      "years_total": 5,
+      "current_title": "Founder & Lead Developer",
+      "industry": "Web3 / Blockchain / AI",
+      "specializations": [
+        "Solana Blockchain Development",
+        "Smart Contract Engineering",
+        "AI Agent Automation",
+        "DeFi Protocol Design",
+        "Tokenomics & Bonding Curves",
+        "Full-Stack Web3 Development"
+      ],
+      
+      "positions": [
+        {
+          "title": "Founder & CEO",
+          "company": "ICM Motion / gICM.app",
+          "duration": "2024 - Present",
+          "highlights": [
+            "Built Solana bonding curve platform for tokenized communities",
+            "Developed AI agent marketplace with 53+ custom skills",
+            "Created automated trading bots for Polymarket (90% cost reduction)",
+            "Managed $5K+ trading capital with arbitrage strategies"
+          ]
+        },
+        {
+          "title": "Blockchain Engineer",
+          "company": "Unix Group / Battle.Tech",
+          "duration": "2023 - 2024",
+          "highlights": [
+            "Developed smart contracts for gaming/AI platforms",
+            "Implemented token launch infrastructure on Base and Solana",
+            "Built tournament platform with automated reward distribution",
+            "Managed GitHub repositories and developer teams"
+          ]
+        },
+        {
+          "title": "Business Development & Operations",
+          "company": "KEIN CAFE / SNACK Platform",
+          "duration": "2022 - Present",
+          "highlights": [
+            "Operated physical cafe location in Frankfurt",
+            "Built community platform infrastructure",
+            "Managed international vendor relationships (USA, Asia)"
+          ]
+        }
+      ]
+    },
+    
+    "education": {
+      "highest_degree": "Bachelor's Equivalent (Professional Experience)",
+      "field_of_study": "Computer Science / Business Informatics",
+      "certifications": [
+        "Solana Blockchain Development",
+        "Rust Programming",
+        "AI Agent Architecture"
+      ],
+      "continuous_learning": "Active contributor to OpenClaw ecosystem, building 53+ automation skills"
+    },
+    
+    "skills": {
+      "programming_languages": [
+        "Rust",
+        "Solidity",
+        "TypeScript",
+        "JavaScript",
+        "Python",
+        "Bash/Shell"
+      ],
+      
+      "blockchain_technologies": [
+        "Solana (Primary)",
+        "Ethereum / EVM",
+        "Base",
+        "Smart Contract Development",
+        "Token Standards (SPL, ERC-20)",
+        "Bonding Curves",
+        "AMM/DEX Integration"
+      ],
+      
+      "frameworks_tools": [
+        "Anchor Framework",
+        "Hardhat",
+        "Node.js",
+        "React / Next.js",
+        "Docker",
+        "Git/GitHub",
+        "CI/CD Pipelines"
+      ],
+      
+      "ai_automation": [
+        "OpenClaw / AI Agent Development",
+        "LLM Integration (Claude, GPT, Ollama)",
+        "Browser Automation",
+        "API Orchestration",
+        "Workflow Automation",
+        "Trading Bot Development"
+      ],
+      
+      "specialized_skills": [
+        "Tokenomics Design",
+        "DeFi Protocol Architecture",
+        "Predictive Market Arbitrage",
+        "Community Building",
+        "Technical Writing",
+        "GitHub Open Source Contribution"
+      ],
+      
+      "soft_skills": [
+        "Entrepreneurship",
+        "Technical Leadership",
+        "Cross-functional Team Management",
+        "Remote Collaboration",
+        "Problem Solving",
+        "Rapid Prototyping"
+      ]
+    },
+    
+    "notable_projects": [
+      {
+        "name": "gICM.app",
+        "description": "AI Agent Marketplace - 53+ custom OpenClaw skills for automation",
+        "url": "https://gicm.app",
+        "technologies": ["OpenClaw", "TypeScript", "Node.js", "AI/LLM"]
+      },
+      {
+        "name": "ICM Motion",
+        "description": "Solana bonding curves for tokenized communities and pre-launch markets",
+        "technologies": ["Rust", "Anchor", "Solana", "React"]
+      },
+      {
+        "name": "Polymarket Trading Bot",
+        "description": "Automated arbitrage system with 90% cost optimization",
+        "technologies": ["Python", "API Integration", "Risk Management"]
+      },
+      {
+        "name": "Battle.Tech",
+        "description": "AI-powered gaming platform with agent tournaments on Base/Solana",
+        "technologies": ["Solidity", "Smart Contracts", "Gaming"]
+      }
+    ],
+    
+    "preferences": {
+      "job_types": ["full-time", "contract", "consulting"],
+      "work_arrangement": ["remote", "hybrid"],
+      "salary_expectations": {
+        "minimum": 150000,
+        "currency": "USD",
+        "period": "annual"
+      },
+      "preferred_company_sizes": ["startup", "mid-size"],
+      "industries_of_interest": [
+        "Web3 / Blockchain",
+        "AI / Machine Learning",
+        "DeFi",
+        "Gaming / GameFi",
+        "Developer Tools"
+      ],
+      "ideal_role": "Senior Blockchain Engineer or AI Automation Engineer with leadership opportunities",
+      "deal_breakers": [
+        "No remote/hybrid option",
+        "Outdated tech stack (no Web3/AI)",
+        "Micromanagement culture"
+      ]
+    },
+    
+    "documents": {
+      "resume_path": "~/Documents/Mirko_Doelger_Resume.pdf",
+      "cover_letter_template_path": "~/Documents/cover_letter_template.txt",
+      "portfolio_path": "https://github.com/0motionguy",
+      "references_available": true
+    },
+    
+    "application_settings": {
+      "platforms": ["linkedin", "wellfound", "web3.career", "crypto.jobs"],
+      "max_applications_per_day": 5,
+      "min_match_score": 0.75,
+      "auto_apply_threshold": 0.85,
+      "require_manual_confirmation": true,
+      "save_application_logs": true,
+      "notifications": {
+        "email_on_application": true,
+        "email_on_response": true,
+        "daily_summary": true
+      }
+    },
+    
+    "screening_answers": {
+      "why_leave_current_job": "Seeking to join an established team where I can focus on engineering and contribute to larger-scale Web3/AI products",
+      "expected_start_date": "2-4 weeks",
+      "salary_expectations": "$150K-$250K depending on role, equity, and remote flexibility",
+      "availability_for_interview": "Flexible, can accommodate US and EU time zones",
+      "what_interests_you": "Building at the intersection of AI and blockchain, especially Solana ecosystem, agent infrastructure, and DeFi protocols"
+    }
+  },
+  
+  "search_criteria": {
+    "job_titles": [
+      "Senior Blockchain Engineer",
+      "Solana Developer",
+      "Web3 Engineer",
+      "AI Automation Engineer",
+      "Smart Contract Developer",
+      "DeFi Protocol Engineer",
+      "Technical Lead - Web3"
+    ],
+    
+    "keywords_required": ["solana", "blockchain", "smart contract", "rust", "web3"],
+    "keywords_preferred": ["defi", "ai", "agent", "automation", "tokenomics", "anchor"],
+    "keywords_excluded": ["frontend-only", "java", "dotnet", "legacy systems"],
+    
+    "experience_levels": ["senior", "lead", "principal"],
+    
+    "locations": [
+      {
+        "remote": true
+      },
+      {
+        "city": "Berlin",
+        "country": "Germany"
+      },
+      {
+        "city": "Frankfurt",
+        "country": "Germany"
+      },
+      {
+        "city": "Remote - US Timezones"
+      }
+    ]
+  }
+}
