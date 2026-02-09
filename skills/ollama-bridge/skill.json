@@ -1,0 +1,10 @@
+{
+  "name": "ollama-bridge",
+  "version": "1.0.0",
+  "description": "Connect to local Ollama instance for zero-cost inference. Use for heartbeats, simple tasks.",
+  "author": "CLAW",
+  "endpoint": "http://localhost:11434",
+  "defaultModel": "llama3.2",
+  "fallback": "anthropic/claude-haiku-3",
+  "useCases": ["heartbeat", "file_ops", "simple_qa", "status_checks"]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "model-router",
+  "version": "1.0.0",
+  "description": "Intelligent model selection based on task type. Route heartbeats to local LLM, complex tasks to Opus.",
+  "author": "CLAW",
+  "routes": {
+    "heartbeat": "ollama/llama3.2",
+    "file_operations": "anthropic/claude-haiku-3",
+    "web_fetch": "anthropic/claude-haiku-3",
+    "coding": "anthropic/claude-sonnet-4",
+    "analysis": "anthropic/claude-sonnet-4",
+    "deep_reasoning": "anthropic/claude-opus-4"
+  },
+  "fallback": "anthropic/claude-sonnet-4"
+}

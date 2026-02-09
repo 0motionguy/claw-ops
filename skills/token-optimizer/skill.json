@@ -1,0 +1,13 @@
+{
+  "name": "token-optimizer",
+  "version": "1.0.0",
+  "description": "Monitor and optimize token usage. Track daily spend, alert on anomalies, auto-switch to cheaper models.",
+  "author": "CLAW",
+  "hooks": ["pre-request", "daily-report"],
+  "config": {
+    "dailyBudget": 5.00,
+    "alertThreshold": 0.80,
+    "cheapModels": ["haiku", "llama3.2", "gemini-flash"],
+    "expensiveModels": ["opus", "gpt-4"]
+  }
+}

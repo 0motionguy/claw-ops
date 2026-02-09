@@ -1,0 +1,9 @@
+{
+  "name": "serper-search",
+  "version": "1.0.0",
+  "description": "Google search via Serper API. 2,500 free searches. Fast SERP data for research.",
+  "author": "CLAW",
+  "endpoint": "https://google.serper.dev",
+  "freeTier": 2500,
+  "features": ["web-search", "news", "images", "places"]
+}

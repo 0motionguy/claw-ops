@@ -1,0 +1,13 @@
+{
+  "name": "openrouter-bridge",
+  "version": "1.0.0",
+  "description": "Access 300+ models via OpenRouter. Free tier: 200 req/day. Unified API with cost comparison.",
+  "author": "CLAW",
+  "endpoint": "https://openrouter.ai/api/v1",
+  "freeModels": [
+    "meta-llama/llama-3.2-3b-instruct:free",
+    "google/gemini-flash-1.5:free",
+    "mistralai/mistral-7b-instruct:free"
+  ],
+  "features": ["cost-comparison", "fallback", "free-tier-priority"]
+}

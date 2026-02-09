@@ -1,0 +1,8 @@
+{
+  "name": "session-manager",
+  "version": "1.0.0",
+  "description": "Prevent session history bloat. Auto-archive sessions, clear buffers, reduce token waste from 111KB uploads.",
+  "author": "CLAW",
+  "commands": ["newsession", "sessionstatus", "autosession"],
+  "autoArchiveInterval": 7200
+}
