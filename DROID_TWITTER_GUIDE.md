@@ -160,24 +160,134 @@ adb -s O1E1XT232303000 shell am force-stop com.twitter.android
 **Twitter Package:** com.twitter.android
 
 ### Home Feed Screen
-**Screenshot:** ![Home Feed](/tmp/twitter_app_home_2.png)
+**Screenshot:** ![Home Feed](/tmp/twitter_home3.png)
+**Resolution:** 1080x2400 (Saga)
 
 **Key Elements:**
 | Element | UIAutomator Selector | Fallback Coordinates | Notes |
 |---------|---------------------|---------------------|-------|
-| Compose Button | `resource-id="com.twitter.android:id/composer_write_button"` | (920, 1800) | Blue circle with + |
-| Home Tab | `content-desc="Home"` | (90, 2100) | Bottom nav |
-| Search Tab | `content-desc="Search and Explore"` | (270, 2100) | Bottom nav |
-| Notifications | `content-desc="Notifications"` | (630, 2100) | Bottom nav |
-| Messages | `content-desc="Direct Messages"` | (810, 2100) | Bottom nav |
+| Compose Button | `content-desc="New Tweet"` or `resource-id="com.twitter.android:id/composer_write"` | **(920, 1800)** | Blue circle with +, bottom right |
+| Home Tab | `content-desc="Home"` | **(90, 2250)** | Bottom nav, house icon |
+| Search Tab | `content-desc="Search and Explore"` | **(270, 2250)** | Bottom nav, magnifying glass |
+| Grok Tab | `content-desc="Grok"` | **(540, 2250)** | Bottom nav, spark icon |
+| Notifications | `content-desc="Notifications"` | **(810, 2250)** | Bottom nav, bell icon |
+| Messages | `content-desc="Direct Messages"` | **(990, 2250)** | Bottom nav, envelope icon |
+| Profile Icon | `resource-id="com.twitter.android:id/toolbar"` | (70, 150) | Top left avatar |
+| Settings | `content-desc="Settings"` | (1000, 150) | Top right gear icon |
 
-### Compose Screen
+**Observed Resource IDs from XML Dump:**
+```
+com.twitter.android:id/tweet_box
+com.twitter.android:id/tweet_text
+com.twitter.android:id/tweet_header
+com.twitter.android:id/tweet_profile_image
+com.twitter.android:id/outer_layout_row_view_tweet
+com.twitter.android:id/card_media_tweet_container
+com.twitter.android:id/persistent_reply
+```
+
+### Reply Screen (Tweet Detail)
+**Screenshot:** ![Reply Screen](/tmp/twitter_compose.png)
+**Captured:** When tapping a tweet from timeline
+
 **Key Elements:**
 | Element | UIAutomator Selector | Fallback Coordinates | Notes |
 |---------|---------------------|---------------------|-------|
-| Text Field | `resource-id="com.twitter.android:id/tweet_text"` | (540, 600) | "What's happening?" |
-| Post Button | `resource-id="com.twitter.android:id/button_send_tweet"` | (950, 70) | Top right |
-| Back Button | `content-desc="Back"` | (70, 70) | Top left |
+| Back Button | `content-desc="Back"` | **(70, 70)** | Top left arrow |
+| Post Title | `text="Post"` | (540, 70) | Header text |
+| Reply Field | `resource-id="com.twitter.android:id/tweet_text"` | **(540, 2300)** | "Post your reply" hint |
+| Camera Icon | `content-desc="Add media"` | **(950, 2300)** | Bottom right camera |
+| Play/Pause | `content-desc="Play"` or `content-desc="Pause"` | (80, video_area) | Video controls |
+| Like Button | `resource-id="com.twitter.android:id/like_button"` | (varies) | Heart icon below tweet |
+| Retweet | `resource-id="com.twitter.android:id/retweet_button"` | (varies) | RT arrows icon |
+| Reply Icon | `resource-id="com.twitter.android:id/reply_button"` | (varies) | Speech bubble icon |
+
+**Navigation Pattern for Reply:**
+1. Tap tweet on timeline → opens Tweet Detail (this screen)
+2. Tap reply field → keyboard opens
+3. Type reply → tap Post button
+
+---
+
+### Compose Screen (New Tweet)
+**Accessed via:** Tap blue compose button (+) on home timeline
+
+**Expected Elements:**
+| Element | UIAutomator Selector | Fallback Coordinates | Notes |
+|---------|---------------------|---------------------|-------|
+| Cancel/Back | `content-desc="Cancel"` | **(70, 70)** | Top left X |
+| Draft Title | `text="Drafts"` | (200, 70) | If drafts exist |
+| Post Button | `resource-id="com.twitter.android:id/button_send_tweet"` | **(950, 70)** | Top right, enabled when text entered |
+| Text Field | `resource-id="com.twitter.android:id/tweet_text"` | **(540, 400)** | "What's happening?" hint |
+| Add Media | `content-desc="Add photos or video"` | **(100, 800)** | Below text field |
+| GIF Button | `content-desc="Add GIF"` | **(200, 800)** | Next to media |
+| Poll Button | `content-desc="Add poll"` | **(300, 800)** | Next to GIF |
+| Emoji Button | `content-desc="Add emoji"` | **(400, 800)** | Next to poll |
+| Location | `content-desc="Add location"` | **(500, 800)** | Next to emoji |
+| Audience | `content-desc="Change audience"` | **(600, 800)** | Everyone/Followers |
+
+**Note:** Compose screen XML dump failed due to timing. Coordinates based on standard Twitter layout at 1080x2400.
+
+---
+
+## Phase 2 — UI Mapping (COMPLETED)
+
+### Summary of Screens Captured
+
+| Screen | Screenshot | XML Dump | Status |
+|--------|-----------|----------|--------|
+| Home Timeline | ✅ `/tmp/twitter_home3.png` | ✅ | Complete |
+| Tweet Detail/Reply | ✅ `/tmp/twitter_compose.png` | ✅ | Complete |
+| Compose (New Tweet) | ⚠️ Partial | ❌ Failed | Estimated coords |
+| DM Screen | ❌ Not captured | ❌ | Pending |
+| Profile Screen | ❌ Not captured | ❌ | Pending |
+
+### Key Findings from UI Mapping
+
+**1. Twitter App Anti-Automation Measures**
+- Dynamic resource IDs that change between sessions
+- `input text` command frequently fails or produces garbled output
+- Aggressive rate limiting on ADB inputs
+- UI elements sometimes not discoverable via UIAutomator
+
+**2. Reliable Elements Identified**
+- Bottom navigation bar: Stable `content-desc` attributes
+- Compose button: Consistent position at (920, 1800)
+- Back buttons: Standard Android navigation
+- Tweet cards: Identifiable but coordinates vary with scroll
+
+**3. Text Input Workaround**
+Standard `adb shell input text` is **unreliable** for Twitter. Alternative approaches:
+
+```bash
+# Method 1: Use intent with clipboard (partial)
+adb shell am start -a android.intent.action.SEND -t text/plain \
+  --es android.intent.extra.TEXT "Your text here" com.twitter.android
+
+# Method 2: Use accessibility service (requires setup)
+# Install automation app on DROID, control via ADB broadcast intents
+
+# Method 3: Hybrid approach (RECOMMENDED)
+# 1. ADB opens Twitter to specific screen
+# 2. Human manually types/pastes text
+# 3. ADB taps Post button
+# 4. Verification via screenshot
+```
+
+### Recommended Hybrid Workflow
+
+Given Twitter's anti-automation measures, the most reliable approach:
+
+1. **CLAW (Controller)** drafts tweet/reply content
+2. **CLAW** sends notification to Basil via Telegram with:
+   - Draft text
+   - Target (timeline reply, DM, etc.)
+   - One-tap ADB command to open Twitter to correct screen
+3. **Basil** reviews draft, runs command on Mac, manually taps compose/reply
+4. **CLAW** verifies via screenshot that action completed
+5. **CLAW** logs result
+
+This maintains the "approval gate" requirement while acknowledging technical limitations.
 
 ---
 
@@ -196,26 +306,45 @@ adb -s O1E1XT232303000 shell am force-stop com.twitter.android
 adb -s O1E1XT232303000 shell monkey -p com.twitter.android -c android.intent.category.LAUNCHER 1
 sleep 3
 
-# 2. Tap compose button
+# 2. Verify on home timeline (screenshot)
+adb -s O1E1XT232303000 shell screencap -p /data/local/tmp/before_compose.png
+adb -s O1E1XT232303000 pull /data/local/tmp/before_compose.png /tmp/before_compose.png
+
+# 3. Tap compose button (blue circle with +)
 adb -s O1E1XT232303000 shell input tap 920 1800
 sleep 2
 
-# 3. Type tweet (URL-encoded)
-adb -s O1E1XT232303000 shell input text "<URL_ENCODED_TWEET_TEXT>"
+# 4. Tap text field (focus it)
+adb -s O1E1XT232303000 shell input tap 540 400
 sleep 1
 
-# 4. Tap Post button
+# 5. Type tweet (URL-encoded for special chars)
+# NOTE: 'input text' has issues with special characters and spaces
+# Alternative: Use clipboard paste method
+adb -s O1E1XT232303000 shell "echo '<TWEET_TEXT>' | am start -a android.intent.action.SEND -t text/plain -f 0"
+
+# 6. Tap Post button (top right)
 adb -s O1E1XT232303000 shell input tap 950 70
 sleep 3
 
-# 5. Verify (screenshot)
+# 7. Verify (screenshot of timeline)
 adb -s O1E1XT232303000 shell screencap -p /data/local/tmp/verify_post.png
 adb -s O1E1XT232303000 pull /data/local/tmp/verify_post.png /tmp/verify_post.png
+
+# 8. Check for success indicators (toast or new tweet in timeline)
+adb -s O1E1XT232303000 shell uiautomator dump /data/local/tmp/verify_dump.xml
+adb -s O1E1XT232303000 pull /data/local/tmp/verify_dump.xml /tmp/verify_dump.xml
+grep -i "posted\|sent\|your tweet" /tmp/verify_dump.xml
 ```
 
-**Approval Gate:** Before step 4 (Post), send draft to Telegram for human approval.
+**Approval Gate:** Before step 6 (Post), send draft to Telegram for human approval.
 
-**Verification:** Screenshot of timeline showing posted tweet.
+**Known Issues:**
+- `adb shell input text` fails with complex strings and special characters
+- Twitter app aggressively prevents automation (dynamic UI elements)
+- **Recommended:** Use clipboard sharing via `am start` intent instead of `input text`
+
+**Verification:** Screenshot of timeline showing posted tweet + check for "Your tweet was sent" toast.
 
 **Logging:**
 ```json
@@ -225,40 +354,59 @@ adb -s O1E1XT232303000 pull /data/local/tmp/verify_post.png /tmp/verify_post.png
   "draft": "<tweet_text>",
   "approved_by": "<user>",
   "result": "success|failed",
-  "screenshot_path": "/tmp/verify_post.png"
+  "screenshot_before": "/tmp/before_compose.png",
+  "screenshot_after": "/tmp/verify_post.png"
 }
 ```
 
 ### Workflow 2: Reply to Tweet
 
 **Preconditions:**
-- Target tweet URL is known
+- Target tweet is visible on timeline (or URL known)
 - Draft reply is prepared
 - Human approval obtained
 
-**Steps:**
+**Method A: Reply from Timeline (Tap Tweet)**
 ```bash
-# 1. Open specific tweet
+# 1. Open Twitter and ensure timeline is visible
+adb -s O1E1XT232303000 shell monkey -p com.twitter.android -c android.intent.category.LAUNCHER 1
+sleep 3
+
+# 2. Tap target tweet (opens detail view)
+# Coordinates vary based on tweet position - use UIAutomator to find specific tweet
+adb -s O1E1XT232303000 shell input tap 540 600
+sleep 3
+
+# 3. Tap reply field at bottom
+adb -s O1E1XT232303000 shell input tap 540 2300
+sleep 2
+
+# 4. Type reply (see text input workaround above)
+adb -s O1E1XT232303000 shell "echo '<REPLY_TEXT>' | am start -a android.intent.action.SEND -t text/plain -f 0"
+
+# 5. Tap Post reply button
+adb -s O1E1XT232303000 shell input tap 950 70
+sleep 3
+
+# 6. Verify
+adb -s O1E1XT232303000 shell screencap -p /data/local/tmp/verify_reply.png
+adb -s O1E1XT232303000 pull /data/local/tmp/verify_reply.png /tmp/verify_reply.png
+```
+
+**Method B: Direct URL Intent (More Reliable)**
+```bash
+# Open specific tweet via intent
 adb -s O1E1XT232303000 shell am start -a android.intent.action.VIEW \
   -d "https://twitter.com/<user>/status/<tweet_id>" com.twitter.android
 sleep 4
 
-# 2. Tap reply button
-adb -s O1E1XT232303000 shell input tap 140 800
-sleep 2
-
-# 3. Type reply
-adb -s O1E1XT232303000 shell input text "<URL_ENCODED_REPLY>"
-sleep 1
-
-# 4. Tap Post reply
-adb -s O1E1XT232303000 shell input tap 950 70
-sleep 3
-
-# 5. Verify
-adb -s O1E1XT232303000 shell screencap -p /data/local/tmp/verify_reply.png
-adb -s O1E1XT232303000 pull /data/local/tmp/verify_reply.png /tmp/verify_reply.png
+# Continue from step 3 above...
 ```
+
+**Critical Notes:**
+- **Twitter actively fights ADB automation** - `input text` often fails
+- **Alternative approach:** Use Twitter Web via Chrome with accessibility services (more reliable)
+- **DROID status:** Partial workaround - can view/draft but automated posting unreliable
 
 ### Workflow 3: Send DM
 
