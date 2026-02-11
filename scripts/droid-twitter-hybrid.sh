@@ -1,46 +1,74 @@
-#!/bin/bash
-# DROID Twitter Hybrid Workflow
+#!/usr/bin/env bash
+# DROID Twitter Hybrid Workflow v2.0 (Optimized)
 # Usage: ./droid-twitter-hybrid.sh <action> <content> [target]
-#
-# Actions:
-#   post    - Draft new tweet (requires manual Post tap)
-#   reply   - Reply to specific tweet (requires manual reply tap)
-#   open    - Just open Twitter to specific screen
 
-set -e
+set -euo pipefail
+IFS=$'\n\t'
 
-DEVICE="O1E1XT232303000"
-LOG_DIR="$HOME/.openclaw/workspace/logs/droid-twitter"
-TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+# Configuration
+readonly DEVICE="${DROID_DEVICE:-O1E1XT232303000}"
+readonly LOG_DIR="${DROID_LOG_DIR:-$HOME/.openclaw/workspace/logs/droid-twitter}"
+readonly TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+readonly TIMEOUT=30
 
 # Ensure log directory exists
 mkdir -p "$LOG_DIR"
 
+# Logging function
 log_action() {
-    echo "[{\"timestamp\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"action\":\"$1\",\"content\":\"$2\",\"target\":\"$3\",\"status\":\"$4\"}]" >> "$LOG_DIR/actions_${TIMESTAMP:0:8}.jsonl"
+    local action="$1"
+    local content="${2:-}"
+    local target="${3:-}"
+    local status="$4"
+    printf '[{"timestamp":"%s","action":"%s","content":"%s","target":"%s","status":"%s"}]\n' \
+        "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$action" "$content" "$target" "$status" \
+        >> "$LOG_DIR/actions_${TIMESTAMP:0:8}.jsonl"
 }
 
+# Validate device connection
+check_device() {
+    if ! adb -s "$DEVICE" shell echo "connected" &>/dev/null; then
+        echo "❌ Error: Device $DEVICE not connected" >&2
+        exit 1
+    fi
+}
+
+# Capture screenshot with timeout
 capture_screenshot() {
-    local name=$1
-    adb -s $DEVICE shell screencap -p /data/local/tmp/${name}.png 2>/dev/null
-    adb -s $DEVICE pull /data/local/tmp/${name}.png /tmp/droid_${name}_${TIMESTAMP}.png 2>/dev/null
-    echo "/tmp/droid_${name}_${TIMESTAMP}.png"
+    local name="$1"
+    local screenshot_path="/tmp/droid_${name}_${TIMESTAMP}.png"
+    
+    if ! timeout "$TIMEOUT" adb -s "$DEVICE" shell screencap -p "/data/local/tmp/${name}.png" 2>/dev/null; then
+        echo "⚠️ Screenshot capture failed" >&2
+        return 1
+    fi
+    
+    if ! timeout "$TIMEOUT" adb -s "$DEVICE" pull "/data/local/tmp/${name}.png" "$screenshot_path" 2>/dev/null; then
+        echo "⚠️ Screenshot pull failed" >&2
+        return 1
+    fi
+    
+    echo "$screenshot_path"
 }
 
-open_twitter_home() {
+# Open Twitter home
+twitter_home() {
     echo "📱 Opening Twitter Home..."
-    adb -s $DEVICE shell monkey -p com.twitter.android -c android.intent.category.LAUNCHER 1
+    timeout "$TIMEOUT" adb -s "$DEVICE" shell monkey -p com.twitter.android -c android.intent.category.LAUNCHER 1
     sleep 3
     capture_screenshot "home"
 }
 
-open_compose() {
+# Open compose screen
+twitter_compose() {
     echo "📝 Opening Compose Screen..."
-    open_twitter_home
-    adb -s $DEVICE shell input tap 920 1800
+    twitter_home
+    timeout "$TIMEOUT" adb -s "$DEVICE" shell input tap 920 1800
     sleep 2
-    local screenshot=$(capture_screenshot "compose")
-    echo "✅ Compose screen ready: $screenshot"
+    local screenshot
+    screenshot=$(capture_screenshot "compose") || true
+    
+    echo "✅ Compose screen ready: ${screenshot:-N/A}"
     echo ""
     echo "👉 ACTION REQUIRED:"
     echo "   1. Type or paste your tweet in the text field"
@@ -50,21 +78,23 @@ open_compose() {
     echo ""
 }
 
-open_reply() {
-    local tweet_url=$1
+# Open reply screen
+twitter_reply() {
+    local tweet_url="${1:-}"
     echo "💬 Opening Reply Screen..."
     
-    if [ -n "$tweet_url" ]; then
-        # Open specific tweet
-        adb -s $DEVICE shell am start -a android.intent.action.VIEW -d "$tweet_url" com.twitter.android
+    if [[ -n "$tweet_url" ]]; then
+        timeout "$TIMEOUT" adb -s "$DEVICE" shell am start -a android.intent.action.VIEW -d "$tweet_url" com.twitter.android
         sleep 4
     else
-        open_twitter_home
+        twitter_home
         echo "⚠️ No tweet URL provided. Please tap a tweet manually."
     fi
     
-    local screenshot=$(capture_screenshot "reply")
-    echo "✅ Reply screen ready: $screenshot"
+    local screenshot
+    screenshot=$(capture_screenshot "reply") || true
+    
+    echo "✅ Reply screen ready: ${screenshot:-N/A}"
     echo ""
     echo "👉 ACTION REQUIRED:"
     echo "   1. Tap the reply field"
@@ -75,83 +105,119 @@ open_reply() {
     echo ""
 }
 
+# Verify post was successful
 verify_post() {
+    local action="$1"
+    local content="${2:-}"
+    local target="${3:-}"
+    
     echo "🔍 Verifying post..."
     sleep 3
-    local screenshot=$(capture_screenshot "verify")
-    adb -s $DEVICE shell uiautomator dump /data/local/tmp/verify.xml 2>/dev/null
-    adb -s $DEVICE pull /data/local/tmp/verify.xml /tmp/droid_verify_${TIMESTAMP}.xml 2>/dev/null
     
-    # Check for success indicators
-    if grep -q "Your tweet was sent\|Posted\|just now" /tmp/droid_verify_${TIMESTAMP}.xml 2>/dev/null; then
+    local screenshot
+    screenshot=$(capture_screenshot "verify") || true
+    
+    timeout "$TIMEOUT" adb -s "$DEVICE" shell uiautomator dump "/data/local/tmp/verify.xml" 2>/dev/null || true
+    timeout "$TIMEOUT" adb -s "$DEVICE" pull "/data/local/tmp/verify.xml" "/tmp/droid_verify_${TIMESTAMP}.xml" 2>/dev/null || true
+    
+    if [[ -f "/tmp/droid_verify_${TIMESTAMP}.xml" ]] && grep -qE "Your tweet was sent|Posted|just now" "/tmp/droid_verify_${TIMESTAMP}.xml" 2>/dev/null; then
         echo "✅ Post verified successfully!"
-        log_action "$1" "$2" "$3" "success"
+        log_action "$action" "$content" "$target" "success"
         return 0
     else
-        echo "⚠️ Verification inconclusive. Check screenshot: $screenshot"
-        log_action "$1" "$2" "$3" "unverified"
+        echo "⚠️ Verification inconclusive. Check screenshot: ${screenshot:-N/A}"
+        log_action "$action" "$content" "$target" "unverified"
         return 1
     fi
 }
 
+# Show usage
+show_usage() {
+    cat <<EOF
+DROID Twitter Hybrid Workflow v2.0
+
+Usage:
+  $0 post "<tweet text>"          - Draft and post new tweet
+  $0 reply "<reply text>" <url>   - Reply to specific tweet
+  $0 open [home|compose]           - Just open Twitter
+
+Environment Variables:
+  DROID_DEVICE      - Device ID (default: O1E1XT232303000)
+  DROID_LOG_DIR     - Log directory path
+
+Examples:
+  $0 post "Hello from DROID! 🦞"
+  $0 reply "Great point!" https://twitter.com/user/status/123
+  DROID_DEVICE=ABC123 $0 post "Custom device"
+
+EOF
+}
+
 # Main execution
-case "$1" in
-    post)
-        echo "═══════════════════════════════════════════════════"
-        echo "  DROID Twitter Hybrid - New Tweet"
-        echo "═══════════════════════════════════════════════════"
-        echo ""
-        if [ -n "$2" ]; then
-            echo "📝 Draft Content:"
-            echo "   $2"
-            echo ""
-        fi
-        open_compose
-        read -p "Press Enter after you've posted..."
-        verify_post "post" "$2" ""
-        ;;
+main() {
+    # Validate device first
+    check_device
     
-    reply)
-        echo "═══════════════════════════════════════════════════"
-        echo "  DROID Twitter Hybrid - Reply to Tweet"
-        echo "═══════════════════════════════════════════════════"
-        echo ""
-        if [ -n "$2" ]; then
-            echo "💬 Reply Content:"
-            echo "   $2"
-            echo ""
-        fi
-        open_reply "$3"
-        read -p "Press Enter after you've posted..."
-        verify_post "reply" "$2" "$3"
-        ;;
+    local action="${1:-}"
+    local content="${2:-}"
+    local target="${3:-}"
     
-    open)
-        echo "📱 Opening Twitter..."
-        case "$2" in
-            home)
-                open_twitter_home
-                ;;
-            compose)
-                open_compose
-                ;;
-            *)
-                open_twitter_home
-                ;;
-        esac
-        ;;
-    
-    *)
-        echo "DROID Twitter Hybrid Workflow"
-        echo ""
-        echo "Usage:"
-        echo "  $0 post \"<tweet text>\"          - Draft and post new tweet"
-        echo "  $0 reply \"<reply text>\" <url>   - Reply to specific tweet"
-        echo "  $0 open [home|compose]           - Just open Twitter"
-        echo ""
-        echo "Examples:"
-        echo "  $0 post \"Hello from DROID! 🦞\""
-        echo "  $0 reply \"Great point!\" https://twitter.com/user/status/123"
-        exit 1
-        ;;
-esac
+    case "$action" in
+        post)
+            cat <<EOF
+═══════════════════════════════════════════════════
+  DROID Twitter Hybrid - New Tweet
+═══════════════════════════════════════════════════
+
+EOF
+            if [[ -n "$content" ]]; then
+                echo "📝 Draft Content:"
+                echo "   $content"
+                echo ""
+            fi
+            twitter_compose
+            read -rp "Press Enter after you've posted..."
+            verify_post "post" "$content" ""
+            ;;
+        
+        reply)
+            cat <<EOF
+═══════════════════════════════════════════════════
+  DROID Twitter Hybrid - Reply to Tweet
+═══════════════════════════════════════════════════
+
+EOF
+            if [[ -n "$content" ]]; then
+                echo "💬 Reply Content:"
+                echo "   $content"
+                echo ""
+            fi
+            twitter_reply "$target"
+            read -rp "Press Enter after you've posted..."
+            verify_post "reply" "$content" "$target"
+            ;;
+        
+        open)
+            echo "📱 Opening Twitter..."
+            case "$content" in
+                home)
+                    twitter_home
+                    ;;
+                compose)
+                    twitter_compose
+                    ;;
+                *)
+                    twitter_home
+                    ;;
+            esac
+            ;;
+        
+        *)
+            show_usage
+            exit 1
+            ;;
+    esac
+}
+
+# Run main
+main "$@"
