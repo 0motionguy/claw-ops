@@ -31,10 +31,10 @@ TEMP_FILE=$(mktemp)
 echo "$PROMPT" > "$TEMP_FILE"
 
 # Run claude CLI with the prompt
-# --no-interactive: Don't open interactive mode
-# --output-format json: Get structured output
+# --print: Non-interactive mode
+# -q: Quiet mode
 cd "$WORKING_DIR"
-claude --no-interactive --output-format markdown < "$TEMP_FILE"
+claude --print -q < "$TEMP_FILE"
 
 # Cleanup
 rm "$TEMP_FILE"
