@@ -1,0 +1,13 @@
+{
+  "models": {
+    "providers": {
+      "claude-cli": {
+        "name": "Claude Code CLI Bridge",
+        "type": "shell",
+        "command": "/Users/andy/.openclaw/workspace/scripts/claude-cli-bridge.sh",
+        "maxTokens": 4096,
+        "description": "Uses Claude Code CLI with Max plan subscription"
+      }
+    }
+  }
+}
