@@ -1,121 +1,126 @@
 {
   "routing": {
-    "version": "2.0",
-    "description": "Smart LLM Router for OpenClaw - Optimizes cost and quality based on task type",
+    "version": "2.1",
+    "description": "Smart LLM Router - Basil's $200 Max Plan Optimized",
     
     "models": {
-      "cheap": {
-        "id": "google/gemini-flash",
-        "cost_per_1k": 0.00,
-        "strengths": ["quick", "simple", "short", "facts", "status"],
-        "max_tokens": 32000,
-        "fallback": "moonshot/kimi-k2.5"
-      },
-      "fast": {
+      "default": {
         "id": "moonshot/kimi-k2.5",
         "cost_per_1k": 0.004,
-        "strengths": ["general", "chat", "explanation", "list"],
+        "strengths": ["general", "chat", "explanation", "list", "default"],
         "max_tokens": 256000,
-        "fallback": "google/gemini-flash"
+        "fallback": "ollama/llama3.2"
       },
       "coding": {
-        "id": "kimi-coding/k2p5",
-        "cost_per_1k": 0.004,
-        "strengths": ["code", "script", "function", "bug", "error", "python", "bash", "javascript", "typescript", "rust", "go"],
-        "max_tokens": 256000,
-        "fallback": "anthropic/claude-sonnet-4"
-      },
-      "analytical": {
-        "id": "anthropic/claude-sonnet-4",
-        "cost_per_1k": 0.018,
-        "strengths": ["analyze", "research", "summarize", "complex", "architecture", "review", "deep"],
+        "id": "shell:/Users/andy/.openclaw/workspace/scripts/claude-cli-bridge.sh",
+        "type": "cli_bridge",
+        "description": "Claude Code CLI via $200 Max Plan subscription",
+        "cost_per_1k": 0.00,
+        "strengths": ["code", "script", "function", "bug", "error", "debug", "implement", "python", "bash", "javascript", "typescript", "rust", "go", "architecture", "complex"],
         "max_tokens": 200000,
-        "fallback": "kimi-coding/k2p5"
-      },
-      "creative": {
-        "id": "anthropic/claude-sonnet-4",
-        "cost_per_1k": 0.018,
-        "strengths": ["write", "creative", "story", "content", "marketing", "copy"],
-        "max_tokens": 200000,
-        "fallback": "moonshot/kimi-k2.5"
+        "fallback": "moonshot/kimi-k2.5",
+        "requires_cli": true
       },
       "local": {
         "id": "ollama/llama3.2",
         "cost_per_1k": 0.00,
-        "strengths": ["offline", "private", "local"],
+        "strengths": ["heartbeat", "status", "quick", "cheap", "local", "offline"],
         "max_tokens": 128000,
-        "fallback": "google/gemini-flash",
+        "fallback": "moonshot/kimi-k2.5",
         "requires": "ollama_running"
+      },
+      "cheap_api": {
+        "id": "google/gemini-flash",
+        "cost_per_1k": 0.00,
+        "strengths": ["facts", "simple", "short"],
+        "max_tokens": 32000,
+        "fallback": "moonshot/kimi-k2.5"
+      },
+      "analytical": {
+        "id": "anthropic/claude-sonnet-4",
+        "cost_per_1k": 0.018,
+        "strengths": ["analyze", "research", "summarize", "complex", "review"],
+        "max_tokens": 200000,
+        "fallback": "shell:/Users/andy/.openclaw/workspace/scripts/claude-cli-bridge.sh"
       }
     },
     
     "rules": [
       {
-        "name": "Code Tasks",
+        "name": "Code Tasks - Use Max Plan",
         "priority": 100,
         "patterns": [
-          "\\b(code|script|function|class|method|bug|error|debug|fix|implement|refactor|python|bash|javascript|typescript|js|ts|go|rust|sql)\\b",
-          "\\b(write|create)\\s+(a|the)?\\s*(script|function|program|code)"
+          "\\b(code|script|function|class|method|bug|error|debug|fix|implement|refactor)\\b",
+          "\\b(python|bash|javascript|typescript|js|ts|go|rust|sql|architect)\\b",
+          "\\b(write|create)\\s+(a|the)?\\s*(script|function|program|code|tool)",
+          "\\b(build|develop)\\b.*\\b(script|tool|system|app)\\b"
         ],
         "model": "coding",
-        "max_tokens": 8000
+        "max_tokens": 16000,
+        "description": "Uses your $200 Max Plan via Claude CLI"
       },
       {
-        "name": "Analysis Tasks",
+        "name": "Heartbeat / Status - Use Ollama",
+        "priority": 95,
+        "patterns": [
+          "\\b(heartbeat|status|check|ls|dir|list)\\b",
+          "^\\s*(status|ls|dir|check)\\s*$",
+          "HEARTBEAT_OK",
+          "^\\s*\\/status\\s*$"
+        ],
+        "model": "local",
+        "max_tokens": 2000,
+        "description": "Free local LLM for quick status checks"
+      },
+      {
+        "name": "Analysis - Use Claude for Deep Work",
         "priority": 90,
         "patterns": [
-          "\\b(analyz|research|investigate|review|compare|evaluate|assess|study|examine)\\b",
-          "\\b(architect|design|structure|pattern|system)\\b"
+          "\\b(analyz|research|investigate|review|compare|evaluate)\\b",
+          "\\b(deep|thorough|comprehensive|detailed)\\b"
         ],
-        "model": "analytical",
-        "max_tokens": 12000
+        "model": "coding",
+        "max_tokens": 12000,
+        "description": "Use Max Plan for deep analysis"
       },
       {
-        "name": "Quick Status",
-        "priority": 80,
-        "patterns": [
-          "\\b(status|check|show|list|what is|how many|get)\\b",
-          "^\\s*(status|ls|dir|show)\\s*$"
-        ],
-        "model": "cheap",
-        "max_tokens": 2000
-      },
-      {
-        "name": "Creative Writing",
-        "priority": 70,
-        "patterns": [
-          "\\b(write|draft|compose|create)\\b.*\\b(text|content|post|article|blog|email|message|copy)\\b",
-          "\\b(creative|story|narrative)\\b"
-        ],
-        "model": "creative",
-        "max_tokens": 6000
-      },
-      {
-        "name": "Short Queries",
+        "name": "Short Queries - Use Ollama",
         "priority": 60,
-        "condition": "token_count < 100",
-        "model": "cheap",
-        "max_tokens": 2000
+        "condition": "token_count < 50",
+        "model": "local",
+        "max_tokens": 1000,
+        "description": "Quick local responses"
       },
       {
-        "name": "Default",
+        "name": "Default - Kimi",
         "priority": 0,
-        "model": "fast",
-        "max_tokens": 8000
+        "model": "default",
+        "max_tokens": 8000,
+        "description": "Default to Kimi for general tasks"
       }
     ],
     
+    "usage_strategy": {
+      "description": "Maximize value from $200 Max Plan subscription",
+      "priorities": [
+        "Use Max Plan (Claude CLI) for: Code, Architecture, Complex Analysis",
+        "Use Kimi for: General chat, Explanations, Default tasks", 
+        "Use Ollama for: Heartbeats, Status checks, Quick queries",
+        "Use API only when: Local models unavailable, Rate limits hit"
+      ]
+    },
+    
     "budget_management": {
       "enabled": true,
-      "daily_limit_usd": 10.00,
+      "daily_limit_usd": 5.00,
       "alert_threshold": 0.80,
-      "switch_to_cheap_threshold": 0.90,
+      "switch_to_local_threshold": 0.90,
       "emergency_threshold": 0.95,
       
       "actions": {
         "at_alert": "notify_user",
-        "at_switch": "auto_switch_to_cheap",
-        "at_emergency": "pause_non_essential + notify"
+        "at_switch": "switch_to_ollama",
+        "at_emergency": "pause_api_calls"
       }
     },
     
@@ -130,16 +135,21 @@
     "fallback_chain": [
       "requested_model",
       "model.fallback",
-      "fast",
-      "cheap",
+      "default",
       "local"
     ],
     
     "metrics": {
       "track_usage": true,
       "track_latency": true,
-      "track_satisfaction": false,
       "log_file": "~/.openclaw/logs/routing-metrics.jsonl"
+    },
+    
+    "notes": {
+      "claude_cli": "Uses $200 Max Plan subscription - no API costs",
+      "ollama": "Local LLM - completely free, requires 'ollama run llama3.2'",
+      "kimi": "Fast, cheap API - good default for most tasks",
+      "max_plan_value": "Your $200/month gets unlimited Claude CLI usage"
     }
   }
 }
