@@ -1,0 +1,145 @@
+{
+  "routing": {
+    "version": "2.0",
+    "description": "Smart LLM Router for OpenClaw - Optimizes cost and quality based on task type",
+    
+    "models": {
+      "cheap": {
+        "id": "google/gemini-flash",
+        "cost_per_1k": 0.00,
+        "strengths": ["quick", "simple", "short", "facts", "status"],
+        "max_tokens": 32000,
+        "fallback": "moonshot/kimi-k2.5"
+      },
+      "fast": {
+        "id": "moonshot/kimi-k2.5",
+        "cost_per_1k": 0.004,
+        "strengths": ["general", "chat", "explanation", "list"],
+        "max_tokens": 256000,
+        "fallback": "google/gemini-flash"
+      },
+      "coding": {
+        "id": "kimi-coding/k2p5",
+        "cost_per_1k": 0.004,
+        "strengths": ["code", "script", "function", "bug", "error", "python", "bash", "javascript", "typescript", "rust", "go"],
+        "max_tokens": 256000,
+        "fallback": "anthropic/claude-sonnet-4"
+      },
+      "analytical": {
+        "id": "anthropic/claude-sonnet-4",
+        "cost_per_1k": 0.018,
+        "strengths": ["analyze", "research", "summarize", "complex", "architecture", "review", "deep"],
+        "max_tokens": 200000,
+        "fallback": "kimi-coding/k2p5"
+      },
+      "creative": {
+        "id": "anthropic/claude-sonnet-4",
+        "cost_per_1k": 0.018,
+        "strengths": ["write", "creative", "story", "content", "marketing", "copy"],
+        "max_tokens": 200000,
+        "fallback": "moonshot/kimi-k2.5"
+      },
+      "local": {
+        "id": "ollama/llama3.2",
+        "cost_per_1k": 0.00,
+        "strengths": ["offline", "private", "local"],
+        "max_tokens": 128000,
+        "fallback": "google/gemini-flash",
+        "requires": "ollama_running"
+      }
+    },
+    
+    "rules": [
+      {
+        "name": "Code Tasks",
+        "priority": 100,
+        "patterns": [
+          "\\b(code|script|function|class|method|bug|error|debug|fix|implement|refactor|python|bash|javascript|typescript|js|ts|go|rust|sql)\\b",
+          "\\b(write|create)\\s+(a|the)?\\s*(script|function|program|code)"
+        ],
+        "model": "coding",
+        "max_tokens": 8000
+      },
+      {
+        "name": "Analysis Tasks",
+        "priority": 90,
+        "patterns": [
+          "\\b(analyz|research|investigate|review|compare|evaluate|assess|study|examine)\\b",
+          "\\b(architect|design|structure|pattern|system)\\b"
+        ],
+        "model": "analytical",
+        "max_tokens": 12000
+      },
+      {
+        "name": "Quick Status",
+        "priority": 80,
+        "patterns": [
+          "\\b(status|check|show|list|what is|how many|get)\\b",
+          "^\\s*(status|ls|dir|show)\\s*$"
+        ],
+        "model": "cheap",
+        "max_tokens": 2000
+      },
+      {
+        "name": "Creative Writing",
+        "priority": 70,
+        "patterns": [
+          "\\b(write|draft|compose|create)\\b.*\\b(text|content|post|article|blog|email|message|copy)\\b",
+          "\\b(creative|story|narrative)\\b"
+        ],
+        "model": "creative",
+        "max_tokens": 6000
+      },
+      {
+        "name": "Short Queries",
+        "priority": 60,
+        "condition": "token_count < 100",
+        "model": "cheap",
+        "max_tokens": 2000
+      },
+      {
+        "name": "Default",
+        "priority": 0,
+        "model": "fast",
+        "max_tokens": 8000
+      }
+    ],
+    
+    "budget_management": {
+      "enabled": true,
+      "daily_limit_usd": 10.00,
+      "alert_threshold": 0.80,
+      "switch_to_cheap_threshold": 0.90,
+      "emergency_threshold": 0.95,
+      
+      "actions": {
+        "at_alert": "notify_user",
+        "at_switch": "auto_switch_to_cheap",
+        "at_emergency": "pause_non_essential + notify"
+      }
+    },
+    
+    "context_optimization": {
+      "compression_enabled": true,
+      "summarize_after_messages": 10,
+      "keep_recent_messages": 3,
+      "max_context_tokens": 8000,
+      "compression_ratio": 0.3
+    },
+    
+    "fallback_chain": [
+      "requested_model",
+      "model.fallback",
+      "fast",
+      "cheap",
+      "local"
+    ],
+    
+    "metrics": {
+      "track_usage": true,
+      "track_latency": true,
+      "track_satisfaction": false,
+      "log_file": "~/.openclaw/logs/routing-metrics.jsonl"
+    }
+  }
+}
